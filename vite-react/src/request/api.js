@@ -1,6 +1,14 @@
 import request from './request'
 
-export const getLists = () => request.get('/chak')
+export const getLists = (params) => request.get('/chak',params)
+
+export const login = (params) =>{
+	return request.post('/login',params)
+}
+
+export const register = (params) =>{
+	return request.post('/register',params)
+}
 
 export const queryText = () => {
 	return request.get('/queryText')

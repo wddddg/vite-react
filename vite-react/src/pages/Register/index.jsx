@@ -1,18 +1,33 @@
-import React from "react";
-import { Form, Input, Button, Checkbox } from 'antd';
+import React, { useState } from "react";
+import { Form, Input, Button, message, Spin } from 'antd';
 import './index.less'
 import LogoImg from '../assets/logo.png'
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+
+import { register } from '../../request/api'
 
 export default function Register() {
 
-    const onFinish = (values) => {
-        console.log('Success:', values);
-    };
 
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+    const navigate = useNavigate();
+
+    const [loading, setLoading] = useState(false);
+
+    const onFinish = (values) => {
+        setLoading(true)
+        register(values).then(res => {
+            if (res?.code == 400) {
+                setLoading(false)
+                message.error(res.msg, 5);
+            } else {
+                message.success(res.msg, 5);
+                setLoading(false)
+                setTimeout(() => {
+                    navigate('/login')
+                }, 2000)
+            }
+        })
     };
     return (
         <div className="login">
@@ -24,7 +39,6 @@ export default function Register() {
                         remember: true,
                     }}
                     onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
                     autoComplete="off"
                 >
                     <Form.Item
@@ -34,6 +48,15 @@ export default function Register() {
                                 required: true,
                                 message: '请输入用户名!',
                             },
+                            () => ({
+                                validator(_, valuename) {
+                                    if (valuename.length >= 6) {
+                                        return Promise.resolve();
+                                    }
+
+                                    return Promise.reject(new Error('请输入3位以上的用户名!'));
+                                },
+                            }),
                         ]}
                     >
                         <Input prefix={<UserOutlined className="site-form-item-icon" />} placeholder="请输入用户名" size="large" />
@@ -44,20 +67,39 @@ export default function Register() {
                         rules={[
                             {
                                 required: true,
-                                message: '请输入密码!',
+                                message: '请输入6位格式的密码!'
                             },
+                            () => ({
+                                validator(_, values) {
+                                    if (values.length >= 6) {
+                                        return Promise.resolve();
+                                    }
+
+                                    return Promise.reject(new Error('请输入6位格式的密码!'));
+                                },
+                            }),
                         ]}
                     >
                         <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="请输入密码" size="large" />
                     </Form.Item>
 
                     <Form.Item
-                        name="password"
+                        name="passwordtwo"
+                        dependencies={['password']}
                         rules={[
                             {
                                 required: true,
                                 message: '请再次输入相同密码!',
                             },
+                            ({ getFieldValue }) => ({
+                                validator(_, value) {
+                                    if (!value || getFieldValue('password') === value) {
+                                        return Promise.resolve();
+                                    }
+
+                                    return Promise.reject(new Error('请再次输入相同密码!'));
+                                },
+                            }),
                         ]}
                     >
                         <Input.Password prefix={<LockOutlined className="site-form-item-icon" />} placeholder="请再次输入相同密码" size="large" />
@@ -70,9 +112,11 @@ export default function Register() {
 
                     <Form.Item>
                         <div className="regorlog">
-                            <Button type="primary" htmlType="submit" className="reg" size="large">
-                                注册
-                            </Button>
+                            <Spin spinning={loading} delay={100}>
+                                <Button type="primary" htmlType="submit" className="reg" size="large">
+                                    注册
+                                </Button>
+                            </Spin>
                         </div>
                     </Form.Item>
                 </Form >

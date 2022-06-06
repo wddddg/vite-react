@@ -1,27 +1,52 @@
-import React from "react";
-import { Form, Input, Button, Checkbox } from 'antd';
+import React, { useEffect, useState } from "react";
+import { Form, Input, Button, message, Spin } from 'antd';
 import './index.less'
 import LogoImg from '../assets/logo.png'
 import { UserOutlined, LockOutlined } from '@ant-design/icons';
-import { getLists } from '../../request/api';
-import { Link } from 'react-router-dom'
+import { login } from '../../request/api';
+import { Link, useNavigate } from 'react-router-dom'
+import { connect, useDispatch } from "react-redux";
 
-export default function Login() {
+function Login(props) {
+
+    const navigate = useNavigate();
+    const dispatch = useDispatch()
+    let num = 1
+    useEffect(() => {
+        if (props?.error?.length && num) {
+            message.error(props.error, 3)
+            dispatch({
+                type: '/login',
+                payload: {
+                    error: ''
+                }
+            })
+            num = 0
+        }
+    }, [props])
+
+    const [loading, setLoading] = useState(false);
+
     const onFinish = (values) => {
-        console.log('Success:', values);
-    };
+        setLoading(true)
+        login(values).then(res => {
+            if (res?.code == 400) {
+                message.error(res.msg, 5);
+                setLoading(false)
+            } else {
+                message.success(res.msg, 5);
+                setLoading(false)
+                localStorage.setItem('username', res.data.username)
+                localStorage.setItem('password', res.data.password)
+                localStorage.setItem('icon', res.data.icon)
+                localStorage.setItem('isadmin', res.data.isadmin)
 
-    const onFinishFailed = (errorInfo) => {
-        console.log('Failed:', errorInfo);
+                setTimeout(() => {
+                    navigate('/')
+                }, 2000)
+            }
+        })
     };
-
-    // const goRegister = () => {
-    //     // console.log(data);
-    //     // getLists().then(res => {
-    //     //     console.log(res);
-    //     // })
-    //     console.log(history);
-    // };
 
     return (
         <div className="login">
@@ -33,7 +58,6 @@ export default function Login() {
                         remember: true,
                     }}
                     onFinish={onFinish}
-                    onFinishFailed={onFinishFailed}
                     autoComplete="off"
                 >
                     <Form.Item
@@ -62,9 +86,11 @@ export default function Login() {
 
                     <Form.Item>
                         <div className="regorlog">
-                            <Button type="primary" htmlType="submit" className="login" size="large">
-                                登录
-                            </Button>
+                            <Spin spinning={loading} delay={1}>
+                                <Button type="primary" htmlType="submit" className="login" size="large">
+                                    登录
+                                </Button>
+                            </Spin>
                             <Button type="defalut" className="reg" size="large" >
                                 <Link to="/register">注册</Link>
                             </Button>
@@ -75,3 +101,11 @@ export default function Login() {
         </div>
     )
 }
+
+const mapStateToProps = (state) => {
+    return {
+        error: state.error
+    }
+}
+
+export default connect(mapStateToProps)(Login)

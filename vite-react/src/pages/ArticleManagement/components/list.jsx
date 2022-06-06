@@ -88,7 +88,7 @@ const data = [
     },
 
 ];
-export default function List() {
+export default function Management() {
     return (
         <div>
             <Table columns={columns} dataSource={data} />

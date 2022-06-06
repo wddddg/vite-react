@@ -1,8 +1,8 @@
-import { useState } from 'react'
-import { Layout, Menu, Avatar, Dropdown, Space } from 'antd';
+import React, { useEffect, useState } from 'react'
+import { Layout, Menu, Avatar, Dropdown, Space, message } from 'antd';
+import { useNavigate, useLocation } from 'react-router-dom';
 const { Header, Sider, Content } = Layout;
 import {
-  DesktopOutlined,
   PieChartOutlined,
   FileOutlined,
   TeamOutlined,
@@ -14,6 +14,7 @@ import './App.less'
 import { Outlet } from 'react-router-dom'
 import LogoImg from './pages/assets/logo.png'
 import Breadcrumb from './components/Breadcrumb'
+import { useDispatch } from 'react-redux';
 
 
 function getItem(label, key, icon, children, type) {
@@ -32,14 +33,6 @@ const downMenu = (
       {
         label: (
           <a >
-            修改资料
-          </a>
-        ),
-        key: '0',
-      },
-      {
-        label: (
-          <a >
             退出登录
           </a>
         ),
@@ -49,22 +42,43 @@ const downMenu = (
   />
 );
 
-
 function App() {
+  const navigate = useNavigate()
+  const dispatch = useDispatch()
+  const localtion = useLocation()
   const [collapsed, setCollapsed] = useState(false);
+  const [defaultKey, setDefaultKey] = useState('/list')
+
   const selectItem = (e) => {
-    console.log('click ', e);
+    navigate(e.key)
+    setDefaultKey(e.key)
   };
 
+  useEffect(() => {
+    setDefaultKey(localtion.pathname)
+  }, [localtion])
+
+
+  useEffect(() => {
+    if (!localStorage.length) {
+      navigate('/login')
+      dispatch({
+        type: '/login',
+        payload: {
+          error: '你还没登录，请先登录再访问！'
+        }
+      })
+    }
+  })
+
   const items = [
-    getItem('列表信息', '1', <PieChartOutlined />),
-    getItem('文档管理', 'sub1', <UserOutlined />, [
-      getItem('新建文档', '3'),
-      getItem('编辑文档', '4'),
-      getItem('删除文档', '5'),
+    getItem('列表信息', '/list', <PieChartOutlined />),
+    getItem('文章管理', '/article-management', <FileOutlined />, [
+      getItem('新建文章', '/article-management/add'),
+      getItem('用户文章列表', '/article-management/management'),
     ]),
-    getItem('用户管理', 'sub2', <TeamOutlined />),
-    getItem('个人中心', '9', <FileOutlined />),
+    getItem('用户管理', '/user-list', <TeamOutlined />),
+    getItem('个人中心', '/user-center', <UserOutlined />),
   ];
 
   const toggleCollapsed = () => {
@@ -80,8 +94,8 @@ function App() {
           </div>
           <Menu
             onClick={selectItem}
-            defaultSelectedKeys={['1']}
-            defaultOpenKeys={['sub1']}
+            selectedKeys={[defaultKey]}
+            defaultOpenKeys={['/article-management']}
             mode="inline"
             items={items}
             theme="dark"
@@ -107,7 +121,7 @@ function App() {
             </div>
           </Header>
           <div className='breadcrumbCss'>
-            <Breadcrumb></Breadcrumb>
+            <Breadcrumb pathnames={localtion}></Breadcrumb>
           </div>
           <Content>
             <div className='content-test'>
