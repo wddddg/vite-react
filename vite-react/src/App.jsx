@@ -27,27 +27,40 @@ function getItem(label, key, icon, children, type) {
   };
 }
 
-const downMenu = (
-  <Menu
-    items={[
-      {
-        label: (
-          <a >
-            退出登录
-          </a>
-        ),
-        key: '1',
-      }
-    ]}
-  />
-);
-
 function App() {
+
   const navigate = useNavigate()
   const dispatch = useDispatch()
   const localtion = useLocation()
   const [collapsed, setCollapsed] = useState(false);
   const [defaultKey, setDefaultKey] = useState('/list')
+  const [defaultName, setDefaultName] = useState('name')
+  const [defaultIcon, setDefaultIcon] = useState('')
+
+
+  const clearLocal = () => {
+    localStorage.clear();
+    message.error('你还没登录，请先登录再访问！', 3)
+    setTimeout(() => {
+      navigate('/login')
+    }, 1000)
+
+  }
+
+  const downMenu = (
+    <Menu
+      items={[
+        {
+          label: (
+            <a onClick={clearLocal}>
+              退出登录
+            </a>
+          ),
+          key: '1',
+        }
+      ]}
+    />
+  )
 
   const selectItem = (e) => {
     navigate(e.key)
@@ -56,6 +69,8 @@ function App() {
 
   useEffect(() => {
     setDefaultKey(localtion.pathname)
+    setDefaultName(localStorage.username)
+    setDefaultIcon(localStorage.icon)
   }, [localtion])
 
 
@@ -69,7 +84,7 @@ function App() {
         }
       })
     }
-  })
+  }, [localStorage])
 
   const items = [
     getItem('列表信息', '/list', <PieChartOutlined />),
@@ -111,8 +126,8 @@ function App() {
                 <Dropdown overlay={downMenu}>
                   <a onClick={e => e.preventDefault()} className="hover-down-muen">
                     <Space>
-                      <Avatar style={{ color: '#fff', backgroundColor: '#7265e6', margin: '0px 10px' }} size="large">U</Avatar>
-                      name
+                      <Avatar style={{ color: '#fff', backgroundColor: '#7265e6', margin: '0px 10px' }} size="large">{defaultIcon != 'null' ? defaultIcon : defaultName}</Avatar>
+                      {defaultName}
                       <DownOutlined />
                     </Space>
                   </a>

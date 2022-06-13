@@ -16,6 +16,7 @@ const BaseRouter = () => (
                 <Route path="/list" element={<List />}></Route>
                 <Route path="/article-management" element={<ArticleManagement />}>
                     <Route path="/article-management/add" element={<Edit />}></Route>
+                    <Route path="/article-management/edit" element={<Edit />}></Route>
                     <Route path="/article-management/management" element={<Management />}></Route>
                 </Route>
                 <Route path="/user-list" element={<UserList />}></Route>

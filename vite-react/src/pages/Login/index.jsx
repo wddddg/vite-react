@@ -40,7 +40,7 @@ function Login(props) {
                 localStorage.setItem('password', res.data.password)
                 localStorage.setItem('icon', res.data.icon)
                 localStorage.setItem('isadmin', res.data.isadmin)
-
+                localStorage.setItem('id', res.data.id)
                 setTimeout(() => {
                     navigate('/')
                 }, 2000)
