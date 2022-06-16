@@ -23,8 +23,7 @@ const columns = [
         key: 'action',
         render: (_, record) => (
             <Space size="middle">
-                <Button type="primary">编辑</Button>
-                <Button type="primary" danger>删除</Button>
+                <Button>查看</Button>
             </Space>
         ),
     },
