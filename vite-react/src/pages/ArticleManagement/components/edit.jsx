@@ -1,9 +1,9 @@
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useImperativeHandle, forwardRef } from "react";
 import { useQuill } from 'react-quilljs';
 import 'quill/dist/quill.snow.css';
 import { Button, PageHeader, message, Upload, Input, Image } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
-import { addText } from '../../../request/api'
+import { addText, updataText } from '../../../request/api'
 
 const editorOption = {
     placeholder: '请输入内容...',
@@ -26,14 +26,15 @@ const editorOption = {
         }
     }
 }
-export default function EditComponents(props) {
+
+function EditComponents(props, ref) {
     const [fileList, setFileList] = useState([]);
     // const [uploading, setUploading] = useState(false);
     const [content, setContent] = useState();
     const [contentHTML, setContentHTML] = useState();
     const [titleVal, setTitleVal] = useState();
-    const [iptValue, setIptValue] = useState();
-
+    const [iptValue, setIptValue] = useState('');
+    const [imgShow, setImgShow] = useState(true);
 
     const upProps = {
         onRemove: (file) => {
@@ -44,10 +45,38 @@ export default function EditComponents(props) {
         },
         beforeUpload: (file) => {
             setFileList([...fileList, file]);
+            setImgShow(false)
             return false;
         },
         fileList,
     };
+
+    useImperativeHandle(ref, () => ({
+        updataTextContent
+    }))
+
+    const updataTextContent = (item) => {
+        const formData = new FormData();
+        formData.append('avatar', fileList[0]);
+        formData.append('img', item.img);
+        formData.append('userId', item.userId);
+        formData.append('content', content);
+        formData.append('title', titleVal)
+        formData.append('contentHTML', contentHTML)
+        formData.append('textId', item.id)
+        updataText(formData).then((res) => {
+            if (res.code === 200) {
+                message.success(res.msg)
+            } else {
+                message.error(res.msg)
+            }
+        })
+    }
+
+    useEffect(() => {
+        setFileList([]);
+        setImgShow(true)
+    }, [props])
 
     const { quill, quillRef } = useQuill(editorOption);
 
@@ -61,9 +90,8 @@ export default function EditComponents(props) {
                 // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
             });
         }
-
         if (props.content && quill) {
-            setIptValue(props.content.title)
+            setIptValue(props?.content?.title)
             quill.clipboard.dangerouslyPasteHTML(props.content.contentHTML);
         }
     }, [props, quill]);
@@ -86,78 +114,44 @@ export default function EditComponents(props) {
     }
 
     const inputBlur = (vals) => {
+        setIptValue(vals.target.value)
         setTitleVal(vals.target.value)
     }
 
-    return props.path === '/article-management/edit' ? (
-        <>
-            <div className="site-page-header-ghost-wrapper">
-                <PageHeader
-                    ghost={false}
-                    onBack={() => window.history.back()}
-                    title="编辑"
-                    subTitle="这是文章编辑"
-                    extra={[
-                        <Button key="1" type="primary" onClick={SubmitArticles}>
-                            提交
-                        </Button>,
-                    ]}
-                    style={{ padding: '10px 20px', display: props.type === 'chak' ? 'none' : 'block' }}
-                >
-                </PageHeader>
-                <div style={{ margin: '10px', display: props.type === 'chak' ? 'none' : 'block' }}>
-                    <Upload {...upProps}>
-                        <Button icon={<UploadOutlined />} disabled={fileList.length === 1}>上传封面</Button>
-                    </Upload>
-                </div>
-                <div style={{ padding: '10px 20px', display: props.type === 'chak' ? 'block' : 'none' }}>
-                    <Image
-                        width={50}
-                        src={`http://localhost:3002/uploads?img=${props?.content?.img}`}
-                    />
-                </div>
-                <div style={{ padding: '10px', wdith: '100%' }} >
-                    <Input size="large" placeholder="标题" onChange={inputBlur} value={iptValue} />
-                </div>
-                <div style={{ width: '100%', height: 300, padding: ' 0px 10px', margin: '10px 0px' }}>
-                    <div ref={quillRef} />
-                </div>
+    return (
+        <div className="site-page-header-ghost-wrapper">
+            <PageHeader
+                ghost={false}
+                title="新建"
+                subTitle="这是新建文章"
+                extra={[
+                    <Button key="1" type="primary" onClick={SubmitArticles}>
+                        提交
+                    </Button>,
+                ]}
+                style={{ padding: '10px 20px', display: props?.type === 'chak' || props.type === 'edit' && props.type ? 'none' : 'block' }}
+            >
+            </PageHeader>
+            <div style={{ margin: '10px', display: props?.type === 'chak' && props.type ? 'none' : 'block' }}>
+                <Upload {...upProps}>
+                    <Button icon={<UploadOutlined />} disabled={fileList.length === 1}>{props.type != 'edit' ? '上传封面' : '修改封面'}</Button>
+                </Upload>
             </div>
-        </>
-    ) : (
-        <>
-
-            <div className="site-page-header-ghost-wrapper">
-                <PageHeader
-                    ghost={false}
-                    title="新建"
-                    subTitle="这是新建文章"
-                    extra={[
-                        <Button key="1" type="primary" onClick={SubmitArticles}>
-                            提交
-                        </Button>,
-                    ]}
-                    style={{ padding: '10px 20px', display: props.type === 'chak' ? 'none' : 'block' }}
-                >
-                </PageHeader>
-                <div style={{ margin: '10px', display: props.type === 'chak' ? 'none' : 'block' }}>
-                    <Upload {...upProps}>
-                        <Button icon={<UploadOutlined />} disabled={fileList.length === 1}>上传封面</Button>
-                    </Upload>
-                </div>
-                <div style={{ padding: '10px 20px', display: props.type === 'chak' ? 'block' : 'none' }}>
-                    <Image
-                        width={200}
-                        src={`http://localhost:3002/uploads?img=${props?.content?.img}`}
-                    />
-                </div>
-                <div style={{ padding: '10px', wdith: '100%' }} >
-                    <Input size="large" placeholder="标题" onChange={inputBlur} value={iptValue} />
-                </div>
-                <div style={{ width: '100%', height: 300, padding: ' 0px 10px', margin: '10px 0px' }}>
-                    <div ref={quillRef} />
-                </div>
+            <div style={{ padding: '10px', display: props.type === 'chak' || props.type === 'edit' && props.type && imgShow ? 'block' : 'none' }}>
+                <Image
+                    width={200}
+                    src={`http://localhost:3002/uploads?img=${props?.content?.img}`}
+                />
             </div>
-        </>
+            <div style={{ padding: '10px', wdith: '100%' }} >
+                <Input size="large" placeholder="标题" onChange={inputBlur} value={iptValue} />
+            </div>
+            <div style={{ width: '100%', height: 300, padding: ' 0px 10px', margin: '10px 0px' }}>
+                <div ref={quillRef} />
+            </div>
+        </div>
     )
 }
+
+
+export default forwardRef(EditComponents)

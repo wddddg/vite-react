@@ -17,12 +17,8 @@ const routes = [
                 breadcrumbName: '新建文章',
             },
             {
-                path: '/article-management/edit',
-                breadcrumbName: '编辑文章',
-            },
-            {
                 path: '/article-management/management',
-                breadcrumbName: '用户文章列表',
+                breadcrumbName: '用户文章列表管理',
             }
         ]
     },

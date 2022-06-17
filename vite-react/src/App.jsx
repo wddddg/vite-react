@@ -90,7 +90,7 @@ function App() {
     getItem('列表信息', '/list', <PieChartOutlined />),
     getItem('文章管理', '/article-management', <FileOutlined />, [
       getItem('新建文章', '/article-management/add'),
-      getItem('用户文章列表', '/article-management/management'),
+      getItem('用户文章列表管理', '/article-management/management'),
     ]),
     getItem('用户管理', '/user-list', <TeamOutlined />),
     getItem('个人中心', '/user-center', <UserOutlined />),

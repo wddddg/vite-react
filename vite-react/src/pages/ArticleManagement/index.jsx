@@ -1,6 +1,6 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import EditComponents from './components/edit'
-import Management from './components/List'
+import Management from './components/list'
 
 import { useLocation } from "react-router-dom";
 export default function ArticleManagement() {

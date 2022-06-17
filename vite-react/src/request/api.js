@@ -10,8 +10,8 @@ export const register = (params) =>{
 	return request.post('/register',params)
 }
 
-export const queryText = () => {
-	return request.get('/queryText')
+export const queryText = (params) => {
+	return request.get( params? `/queryText?userId=${params}` : '/queryText')
 }
 
 export const addText = (params) => {

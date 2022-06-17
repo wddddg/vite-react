@@ -1,96 +1,100 @@
-import React from "react";
-import { Space, Table, Button } from 'antd';
-
-const columns = [
-    {
-        title: 'Name',
-        dataIndex: 'name',
-        key: 'name',
-        render: (text) => <a>{text}</a>,
-    },
-    {
-        title: 'Age',
-        dataIndex: 'age',
-        key: 'age',
-    },
-    {
-        title: 'Address',
-        dataIndex: 'address',
-        key: 'address',
-    },
-    {
-        title: 'Action',
-        key: 'action',
-        render: (_, record) => (
-            <Space size="middle">
-                <Button>查看</Button>
-            </Space>
-        ),
-    },
-];
-const data = [
-    {
-        key: '1',
-        name: 'John Brown',
-        age: 32,
-        address: 'New York No. 1 Lake Park',
-    },
-    {
-        key: '2',
-        name: 'Jim Green',
-        age: 42,
-        address: 'London No. 1 Lake Park',
-    },
-    {
-        key: '3',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-    },
-    {
-        key: '32',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-    },
-    {
-        key: '31',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-    },
-    {
-        key: '33',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-    },
-    {
-        key: '34',
-        name: 'Joe Black',
-        age: 32,
-        address: 'Sidney No. 1 Lake Park',
-    },
-    {
-        key: '35',
-        name: 'Joe Black',
-        age: 32,
-    },
-    {
-        key: '36',
-        name: 'Joe Black',
-    },
-    {
-        key: '37',
-        name: 'Joe Black',
-        age: 32,
-    },
-
-];
+import React, { useEffect, useState, useRef } from "react";
+import { Space, Table, Button, Image, Popconfirm, message } from 'antd';
+import { delText, queryText } from '../../../request/api'
+import { useLocation } from "react-router-dom";
+import Drawer from "../../../components/Drawer";
+const text = '确定要删除文章吗?';
 export default function Management() {
+    let locations = useLocation()
+    const columns = [
+        {
+            title: '用户',
+            dataIndex: 'username',
+            key: 'username',
+            render: (text) => <a>{text}</a>,
+        },
+        {
+            title: '标题',
+            dataIndex: 'title',
+            key: 'title',
+            ellipsis: true,
+        },
+        {
+            title: '文章内容',
+            dataIndex: 'content',
+            key: 'content',
+            ellipsis: true,
+        },
+        {
+            title: '首页图片',
+            dataIndex: 'img',
+            key: 'img',
+            render: (_, record) => (
+                <Image
+                    width={30}
+                    src={`http://localhost:3002/uploads?img=${record.img}`}
+                />
+            ),
+        },
+        {
+            title: 'Action',
+            render: (_, record) => (
+                <Space size="middle">
+                    <Button type="link" size="small" onClick={() => { childOpenDrawer(record) }} >修改</Button>
+
+                    <Popconfirm
+                        placement="bottomRight"
+                        title={text}
+                        onConfirm={() => { changDleText(record) }}
+                        okText="是"
+                        cancelText="否"
+                    >
+                        <Button type="link" size="small">删除</Button>
+                    </Popconfirm>
+                </Space>
+            ),
+        },
+    ];
+    const unitRef = useRef(null)
+    const [data, setData] = useState([])
+    const [content, setContent] = useState(null)
+    const childOpenDrawer = (item) => {
+        unitRef.current.childOpenDrawer(true)//结果：'父组件调用'
+        setContent(item)
+    }
+    const changDleText = async (item) => {
+        await delText({ userId: item.userId, textId: item.id, isadmin: localStorage.getItem('isadmin'), img: item.img })
+            .then((res) => {
+                message.success(res.msg)
+            })
+        queryTextFun()
+    }
+    async function queryTextFun() {
+        let resbody = []
+        await queryText(localStorage.getItem('id')).then(res => {
+            resbody = [...res]
+            resbody.map((item) => {
+                item.key = item.id
+            })
+        })
+        setData(resbody)
+    }
+    useEffect(() => {
+        queryTextFun()
+    }, [locations])
+
+    const bindChild = (val) => {
+        if (val) {
+            setTimeout(() => {
+                queryTextFun()
+            }, 1000);
+        }
+    }
+
     return (
         <div>
             <Table columns={columns} dataSource={data} />
+            <Drawer ref={unitRef} content={content} type='edit' setParent={bindChild.bind(this)} ></Drawer>
         </div>
     )
 }
