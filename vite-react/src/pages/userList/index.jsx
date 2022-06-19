@@ -1,52 +1,63 @@
-import { Avatar, List, message } from 'antd';
-import VirtualList from 'rc-virtual-list';
-import { useEffect, useState } from 'react';
-const fakeDataUrl =
-    'https://randomuser.me/api/?results=20&inc=name,gender,email,nat,picture&noinfo';
-const ContainerHeight = 400;
+import React, { useEffect, useState } from 'react';
+import { Avatar, List, Button, message, Switch } from 'antd';
+import { queryAllUser, delUser, setAdmin } from '../../request/api'
 
 export default function UserList() {
-    const [data, setData] = useState([]);
 
-    const appendData = () => {
-        fetch(fakeDataUrl)
-            .then((res) => res.json())
-            .then((body) => {
-                setData(data.concat(body.results));
-                message.success(`${body.results.length} more items loaded!`);
-            });
-    };
+    let [data, setData] = useState([])
+
+    async function queryUsers() {
+        await queryAllUser().then(res => {
+            setData(res.data)
+        })
+    }
+
 
     useEffect(() => {
-        appendData();
-    }, []);
+        queryUsers()
+    }, [localStorage])
 
-    const onScroll = (e) => {
-        if (e.currentTarget.scrollHeight - e.currentTarget.scrollTop === ContainerHeight) {
-            appendData();
-        }
-    };
+    const adminDleUser = async ({ adminId, userId }) => {
+        await delUser({ isadmin: adminId, userId }).then(res => {
+            if (res.code === 200) {
+                message.success(res.msg)
+            } else {
+                message.error(res.msg)
+            }
+        })
+        queryUsers()
+    }
+
+    const adminChange = ({ adminId, userId }) => {
+        setAdmin({ isadmin: adminId, userId }).then(res => {
+            if (res.code === 200) {
+                message.success(res.msg)
+            } else {
+                message.error(res.msg)
+            }
+        })
+    }
 
     return (
-        <List>
-            <VirtualList
-                data={data}
-                height={ContainerHeight}
-                itemHeight={47}
-                itemKey="email"
-                onScroll={onScroll}
-            >
-                {(item) => (
-                    <List.Item key={item.email}>
+        <div style={{ padding: '10px' }}>
+            <List
+                itemLayout="horizontal"
+                dataSource={data}
+                renderItem={(item) => (
+                    <List.Item>
                         <List.Item.Meta
-                            avatar={<Avatar src={item.picture.large} />}
-                            title={<a href="https://ant.design">{item.name.last}</a>}
-                            description={item.email}
+                            avatar={item.icon === null ? <Avatar style={{ color: '#fff', backgroundColor: '#7265e6' }}>{item.username}</Avatar> : <Avatar src={`http://localhost:3002/uploads?img=${item.icon}`} />}
+                            title={<a href="#">{item.username}</a>}
+                            description={`已发布过的文章` + item.essayLength + `篇`}
                         />
-                        <div>Content</div>
+                        <div style={{ margin: '0px 30px', display: 'flex' }}>
+                            <span style={{ margin: '0px 10px' }}>设置管理员:</span>
+                            <Switch defaultChecked={item.isadmin === '57' ? true : false} onChange={() => { adminChange({ adminId: localStorage.getItem('isadmin'), userId: item.id }) }} />
+                        </div>
+                        <Button style={{ display: localStorage.getItem('isadmin') === '57' ? 'block' : 'none' }} onClick={() => { adminDleUser({ adminId: localStorage.getItem('isadmin'), userId: item.id }) }} >删除用户</Button>
                     </List.Item>
                 )}
-            </VirtualList>
-        </List>
+            />
+        </div>
     );
 };
