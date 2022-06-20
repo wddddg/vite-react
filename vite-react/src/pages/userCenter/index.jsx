@@ -4,11 +4,13 @@ import { Layout, Image, Button, List, Upload, message, Modal, Input } from 'antd
 const { Sider, Content } = Layout;
 
 import { uploadsAvatar, updataAdminPassword, queryText } from '../../request/api'
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom';
 import Drawer from "../../components/Drawer";
 import './index.less'
 
+
 function UserCenter() {
+    const localtion = useLocation()
     const navigate = useNavigate()
     const unitRef = useRef(null)
     const [visible, setVisible] = useState(false);
@@ -122,7 +124,7 @@ function UserCenter() {
             setData(resData)
         }
         queryTextAwait()
-    })
+    }, [localtion])
 
     return (
         <div className="usercenter">

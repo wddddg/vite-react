@@ -107,6 +107,9 @@ function EditComponents(props, ref) {
         addText(formData).then((res) => {
             if (res.code === 200) {
                 message.success(res.msg)
+                setFileList([])
+                setIptValue('')
+                quill.clipboard.dangerouslyPasteHTML('')
             } else {
                 message.error(res.msg)
             }

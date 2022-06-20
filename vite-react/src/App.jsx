@@ -62,7 +62,7 @@ function App() {
       },
       series: [
         {
-          name: 'Access From',
+          name: '文章统计',
           type: 'pie',
           radius: '40%',
           data: [
@@ -96,7 +96,7 @@ function App() {
       },
       series: [
         {
-          name: 'Access From',
+          name: '文章和用户比例',
           type: 'pie',
           radius: '40%',
           data: [
@@ -130,7 +130,7 @@ function App() {
       },
       series: [
         {
-          name: 'Access From',
+          name: '用户统计',
           type: 'pie',
           radius: '40%',
           data: [
