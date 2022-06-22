@@ -100,11 +100,11 @@ function UserCenter(props) {
                 localStorage.setItem('icon', res.data[0].icon)
                 localStorage.setItem('isadmin', res.data[0].isadmin)
                 localStorage.setItem('id', res.data[0].id)
+                navigate('/user-center')
             }
             message.success(res.msg)
             setFileList([])
         })
-        window.location.reload()
     }
 
     const childOpenDrawer = (item) => {
@@ -121,7 +121,7 @@ function UserCenter(props) {
     }
 
     useEffect(() => {
-        setUpdataAvatar(`http://localhost:3002/uploads?img=${localStorage.getItem('icon')}`)
+        setUpdataAvatar(`http://182.61.138.230:3002/uploads?img=${localStorage.getItem('icon')}`)
     }, [localStorage.getItem('icon')])
 
     useEffect(() => {
@@ -171,7 +171,7 @@ function UserCenter(props) {
                         <Upload {...upProps} showUploadList={false} onChange={uploadAvatar}>
                             <Button>修改头像</Button>
                         </Upload>
-                        <Button onClick={showModal}>修改密码</Button>
+                        <Button onClick={showModal} style={{ marginLeft: '14px' }}>修改密码</Button>
                     </div>
                     <div style={{ display: propsData ? 'none' : 'block', textAlign: 'center', lineHeight: '40px' }}>
                         {props?.userData?.username}

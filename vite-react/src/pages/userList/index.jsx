@@ -54,7 +54,7 @@ export default function UserList() {
                 renderItem={(item) => (
                     <List.Item>
                         <List.Item.Meta
-                            avatar={item.icon === null ? <Avatar style={{ color: '#fff', backgroundColor: '#7265e6' }}>{item.username}</Avatar> : <Avatar src={`http://localhost:3002/uploads?img=${item.icon}`} />}
+                            avatar={item.icon === null ? <Avatar style={{ color: '#fff', backgroundColor: '#7265e6' }}>{item.username}</Avatar> : <Avatar src={`http://182.61.138.230:3002/uploads?img=${item.icon}`} />}
                             title={<a href="#" onClick={(e) => { showUser(item), e.preventDefault() }}>{item.username}</a>}
                             description={`已发布过的文章` + item.essayLength + `篇`}
                         />

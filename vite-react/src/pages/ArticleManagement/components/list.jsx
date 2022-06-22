@@ -33,7 +33,7 @@ export default function Management() {
             render: (_, record) => (
                 <Image
                     width={30}
-                    src={`http://localhost:3002/uploads?img=${record.img}`}
+                    src={`http://182.61.138.230:3002/uploads?img=${record.img}`}
                 />
             ),
         },

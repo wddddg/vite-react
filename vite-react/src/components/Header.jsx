@@ -33,15 +33,6 @@ function HeaderComponents(props) {
         setDefaultIcon(localStorage.getItem('icon'))
     }, [localtion])
 
-    // subscribe(() => {
-    //     console.log(111);
-    // })
-
-    // const changeAvatar = () => {
-    //     setDefaultIcon('')
-    //     setDefaultIcon(`http://localhost:3002/uploads?img=${localStorage.getItem('icon')}`)
-    // }
-
     const downMenu = (
         <Menu
             items={[
@@ -67,7 +58,7 @@ function HeaderComponents(props) {
                     <Dropdown overlay={downMenu}>
                         <a onClick={e => e.preventDefault()} className="hover-down-muen">
                             <Space>
-                                <Image preview={false} src={`http://localhost:3002/uploads?img=${defaultIcon}`} style={{ borderRadius: '50%', width: '42px', height: '42px', position: 'relative', top: '13px', margin: '0px 10px', display: defaultIcon === 'null' ? 'none' : 'block' }} />
+                                <Image preview={false} src={`http://182.61.138.230:3002/uploads?img=${defaultIcon}`} style={{ borderRadius: '50%', width: '42px', height: '42px', position: 'relative', top: '13px', margin: '0px 10px', display: defaultIcon === 'null' ? 'none' : 'block' }} />
                                 <Avatar style={{ color: '#fff', backgroundColor: '#7265e6', margin: '0px 10px', display: defaultIcon != 'null' ? 'none' : 'block' }} size="large">{defaultName}</Avatar>
                                 {defaultName}
                                 <DownOutlined />

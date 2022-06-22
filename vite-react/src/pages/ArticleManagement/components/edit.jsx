@@ -143,7 +143,7 @@ function EditComponents(props, ref) {
             <div style={{ padding: '10px', display: props.type === 'chak' || props.type === 'edit' && props.type && imgShow ? 'block' : 'none' }}>
                 <Image
                     width={200}
-                    src={`http://localhost:3002/uploads?img=${props?.content?.img}`}
+                    src={`http://182.61.138.230:3002/uploads?img=${props?.content?.img}`}
                 />
             </div>
             <div style={{ padding: '10px', wdith: '100%' }} >
