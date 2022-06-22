@@ -3,6 +3,7 @@ import { Space, Table, Button, Image, Popconfirm, message } from 'antd';
 import { delText, queryText } from '../../../request/api'
 import { useLocation } from "react-router-dom";
 import Drawer from "../../../components/Drawer";
+import DarwerUser from '../../../components/DrawerUser'
 const text = '确定要删除文章吗?';
 export default function Management() {
     let locations = useLocation()
@@ -11,7 +12,7 @@ export default function Management() {
             title: '用户',
             dataIndex: 'username',
             key: 'username',
-            render: (text) => <a>{text}</a>,
+            render: (text, record) => <Button type="link" onClick={() => { userInfo(record.userId) }}>{text}</Button>,
         },
         {
             title: '标题',
@@ -56,11 +57,19 @@ export default function Management() {
         },
     ];
     const unitRef = useRef(null)
+    const unitUserRef = useRef(null)
     const [data, setData] = useState([])
     const [content, setContent] = useState(null)
+    const [showUserInfo, setShowUserInfo] = useState(null)
+
+
     const childOpenDrawer = (item) => {
         unitRef.current.childOpenDrawer(true)//结果：'父组件调用'
         setContent(item)
+    }
+    const userInfo = (val) => {
+        unitUserRef.current.childOpenDrawer(true)
+        setShowUserInfo(val)
     }
     const changDleText = async (item) => {
         await delText({ userId: item.userId, textId: item.id, isadmin: localStorage.getItem('isadmin'), img: item.img })
@@ -93,8 +102,9 @@ export default function Management() {
 
     return (
         <div>
-            <Table columns={columns} dataSource={data} />
+            <Table columns={columns} dataSource={data} pagination={false} style={{ height: '795px', overflow: 'auto' }} />
             <Drawer ref={unitRef} content={content} type='edit' setParent={bindChild.bind(this)} ></Drawer>
+            <DarwerUser ref={unitUserRef} showUserInfo={showUserInfo}></DarwerUser>
         </div>
     )
 }

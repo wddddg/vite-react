@@ -9,7 +9,7 @@ import Drawer from "../../components/Drawer";
 import './index.less'
 
 
-function UserCenter() {
+function UserCenter(props) {
     const localtion = useLocation()
     const navigate = useNavigate()
     const unitRef = useRef(null)
@@ -23,6 +23,7 @@ function UserCenter() {
     const [olIptState, setOlIptState] = useState('')
     const [data, setData] = useState([])
     const [content, setContent] = useState(null)
+    const [propsData, setPropsData] = useState(true)
 
     const handleOk = () => {
         if (olPassword != '' && nvPassword != '') {
@@ -111,20 +112,29 @@ function UserCenter() {
         setContent(item)
     }
 
+    async function queryTextAwait(id) {
+        let resData = []
+        await queryText(id).then((res) => {
+            resData = [...res]
+        })
+        setData(resData)
+    }
+
     useEffect(() => {
         setUpdataAvatar(`http://localhost:3002/uploads?img=${localStorage.getItem('icon')}`)
     }, [localStorage.getItem('icon')])
 
     useEffect(() => {
-        async function queryTextAwait() {
-            let resData = []
-            await queryText(localStorage.getItem('id')).then((res) => {
-                resData = [...res]
-            })
-            setData(resData)
-        }
-        queryTextAwait()
+        queryTextAwait(localStorage.getItem('id'))
     }, [localtion])
+
+    useEffect(() => {
+        let { userData } = props
+        if (userData) {
+            setPropsData(false)
+            queryTextAwait(props?.userData?.id)
+        }
+    }, [props?.userData])
 
     return (
         <div className="usercenter">
@@ -157,16 +167,20 @@ function UserCenter() {
                             <Image src={updataAvatar} />
                         </Image.PreviewGroup>
                     </div>
-                    <div className="usercenter_sider_action">
+                    <div className="usercenter_sider_action" style={{ display: propsData ? 'block' : 'none' }}>
                         <Upload {...upProps} showUploadList={false} onChange={uploadAvatar}>
                             <Button>修改头像</Button>
                         </Upload>
                         <Button onClick={showModal}>修改密码</Button>
                     </div>
+                    <div style={{ display: propsData ? 'none' : 'block', textAlign: 'center', lineHeight: '40px' }}>
+                        {props?.userData?.username}
+                    </div>
                 </Sider>
                 <Content className="usercenter_content">
                     <div style={{ margin: '10px 0px 15px' }}>文章展示：</div>
                     <List
+                        style={{ height: '730px', overflow: 'auto' }}
                         bordered
                         size="small"
                         dataSource={data}

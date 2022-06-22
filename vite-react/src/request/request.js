@@ -1,21 +1,21 @@
 import axios from 'axios'
 
-const axiosOption ={
-    baseURL:'http://127.0.0.1:3002',
-    timeout:5000
+const axiosOption = {
+    baseURL: 'http://182.61.138.230:3002',
+    timeout: 5000
 }
 
 const instance = axios.create(axiosOption)
 
-instance.interceptors.request.use(function(config){
+instance.interceptors.request.use(function (config) {
     return config;
-},function(error){
+}, function (error) {
     return Promise.reject(error)
 })
 
-instance.interceptors.response.use(function(response){
+instance.interceptors.response.use(function (response) {
     return response.data;
-},function(error){
+}, function (error) {
     return Promise.reject(error)
 })
 

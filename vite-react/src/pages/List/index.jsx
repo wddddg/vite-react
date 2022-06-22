@@ -2,6 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import { Space, Table, Button, Image } from 'antd';
 import { queryText } from '../../request/api'
 import Drawer from "../../components/Drawer";
+import DarwerUser from '../../components/DrawerUser'
 import { useLocation } from "react-router-dom";
 export default function List() {
     let locations = useLocation()
@@ -10,7 +11,7 @@ export default function List() {
             title: '用户',
             dataIndex: 'username',
             key: 'username',
-            render: (text) => <a>{text}</a>,
+            render: (text, record) => <Button type="link" onClick={() => { userInfo(record.userId) }}>{text}</Button>,
         },
         {
             title: '标题',
@@ -45,11 +46,17 @@ export default function List() {
         },
     ];
     const unitRef = useRef(null)
+    const unitUserRef = useRef(null)
     const [data, setData] = useState([])
     const [content, setContent] = useState(null)
+    const [showUserInfo, setShowUserInfo] = useState(null)
     const childOpenDrawer = (item) => {
         unitRef.current.childOpenDrawer(true)//结果：'父组件调用'
         setContent(item)
+    }
+    const userInfo = (val) => {
+        unitUserRef.current.childOpenDrawer(true)
+        setShowUserInfo(val)
     }
     useEffect(() => {
         async function data() {
@@ -67,8 +74,9 @@ export default function List() {
 
     return (
         <div>
-            <Table columns={columns} dataSource={data} />
+            <Table columns={columns} dataSource={data} pagination={false} style={{ height: '795px', overflow: 'auto' }} />
             <Drawer ref={unitRef} content={content} type='chak'></Drawer>
+            <DarwerUser ref={unitUserRef} showUserInfo={showUserInfo}></DarwerUser>
         </div>
     )
 }
