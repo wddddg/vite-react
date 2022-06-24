@@ -74,7 +74,7 @@ function EditComponents(props, ref) {
         formData.append('img', item.img);
         formData.append('userId', item.userId);
         formData.append('content', content);
-        formData.append('title', titleVal)
+        formData.append('title', titleVal != undefined ? titleVal : item.title)
         formData.append('contentHTML', contentHTML)
         formData.append('textId', item.id)
         updataText(formData).then((res) => {
