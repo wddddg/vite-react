@@ -121,7 +121,9 @@ function UserCenter(props) {
     }
 
     useEffect(() => {
-        setUpdataAvatar(`http://182.61.138.230:3002/uploads?img=${localStorage.getItem('icon')}`)
+        if (!props?.userData) {
+            setUpdataAvatar(`http://182.61.138.230:3002/uploads?img=${localStorage.getItem('icon')}`)
+        }
     }, [localStorage.getItem('icon')])
 
     useEffect(() => {
@@ -133,6 +135,7 @@ function UserCenter(props) {
         if (userData) {
             setPropsData(false)
             queryTextAwait(props?.userData?.id)
+            setUpdataAvatar(`http://182.61.138.230:3002/uploads?img=${userData.icon}`)
         }
     }, [props?.userData])
 

@@ -50,7 +50,7 @@ export default function Register() {
                             },
                             () => ({
                                 validator(_, valuename) {
-                                    if (valuename.length >= 6) {
+                                    if (valuename.length >= 3) {
                                         return Promise.resolve();
                                     }
 

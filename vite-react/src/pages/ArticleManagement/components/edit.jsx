@@ -1,40 +1,53 @@
 import React, { useState, useEffect, useImperativeHandle, forwardRef } from "react";
-import { useQuill } from 'react-quilljs';
+import Quill from 'quill';
 import 'quill/dist/quill.snow.css';
 import { Button, PageHeader, message, Upload, Input, Image } from 'antd';
 import { UploadOutlined } from '@ant-design/icons';
 import { addText, updataText } from '../../../request/api'
 
-const editorOption = {
-    placeholder: '请输入内容...',
-    modules: {
-        toolbar: {
-            container: [
-                ['bold', 'italic', 'underline', 'strike'], // 加粗，斜体，下划线，删除线
-                [{ header: 1 }, { header: 2 }], // 标题，键值对的形式；1、2表示字体大小
-                [{ list: 'ordered' }, { list: 'bullet' }], // 列表
-                [{ indent: '-1' }, { indent: '+1' }], // 缩进
-                [{ direction: 'rtl' }], // 文本方向
-                [{ size: ['small', false, 'large', 'huge'] }], // 字体大小
-                [{ header: [1, 2, 3, 4, 5, 6, false] }], // 几级标题
-                [{ color: [] }, { background: [] }], // 字体颜色，字体背景颜色
-                [{ font: [] }], // 字体
-                [{ align: [] }], // 对齐方式
-                ['clean'], // 清除字体样式
-                // ['image', 'video'], // 上传图片、上传视频
-            ],
+function EditComponents(props, ref) {
+    const editorOption = {
+        readOnly: false,
+        theme: 'snow',
+        debug: 'warn',
+        placeholder: '请输入内容...',
+        modules: {
+            toolbar: {
+                container: [
+                    ['bold', 'italic', 'underline', 'strike'], // 加粗，斜体，下划线，删除线
+                    [{ header: 1 }, { header: 2 }], // 标题，键值对的形式；1、2表示字体大小
+                    [{ list: 'ordered' }, { list: 'bullet' }], // 列表
+                    [{ indent: '-1' }, { indent: '+1' }], // 缩进
+                    [{ direction: 'rtl' }], // 文本方向
+                    [{ size: ['small', false, 'large', 'huge'] }], // 字体大小
+                    [{ header: [1, 2, 3, 4, 5, 6, false] }], // 几级标题
+                    [{ color: [] }, { background: [] }], // 字体颜色，字体背景颜色
+                    [{ font: [] }], // 字体
+                    [{ align: [] }], // 对齐方式
+                    ['clean'], // 清除字体样式
+                    // ['image', 'video'], // 上传图片、上传视频
+                ],
+            }
         }
     }
-}
-
-function EditComponents(props, ref) {
     const [fileList, setFileList] = useState([]);
-    // const [uploading, setUploading] = useState(false);
     const [content, setContent] = useState();
     const [contentHTML, setContentHTML] = useState();
     const [titleVal, setTitleVal] = useState();
     const [iptValue, setIptValue] = useState('');
     const [imgShow, setImgShow] = useState(true);
+
+    let quill = null
+
+    useEffect(() => {
+        if (document.querySelector('#quill-editors')) {
+            quill = new Quill('#quill-editors', editorOption)
+        }
+        let editors = document.querySelectorAll('.ql-toolbar.ql-snow')
+        if (editors.length === 2) {
+            editors[0].style.display = 'none'
+        }
+    }, [])
 
     const upProps = {
         onRemove: (file) => {
@@ -78,21 +91,16 @@ function EditComponents(props, ref) {
         setImgShow(true)
     }, [props])
 
-    const { quill, quillRef } = useQuill(editorOption);
-
     useEffect(() => {
         if (quill) {
             quill.on('text-change', (delta, oldDelta, source) => {
-                // console.log(quill.getText()); // Get text only
                 setContent(quill.getText())
-                // console.log(quill.getContents()); // Get delta contents
-                setContentHTML(quill.root.innerHTML); // Get innerHTML using quill
-                // console.log(quillRef.current.firstChild.innerHTML); // Get innerHTML using quillRef
+                setContentHTML(quill.root.innerHTML);
             });
         }
-        if (props.content && quill) {
+        if (props.content && document.querySelector('.ql-editor')) {
             setIptValue(props?.content?.title)
-            quill.clipboard.dangerouslyPasteHTML(props.content.contentHTML);
+            document.querySelector('.ql-editor').innerHTML = props.content.contentHTML
         }
     }, [props, quill]);
 
@@ -109,7 +117,7 @@ function EditComponents(props, ref) {
                 message.success(res.msg)
                 setFileList([])
                 setIptValue('')
-                quill.clipboard.dangerouslyPasteHTML('')
+                document.querySelector('.ql-editor').innerHTML = ''
             } else {
                 message.error(res.msg)
             }
@@ -150,7 +158,7 @@ function EditComponents(props, ref) {
                 <Input size="large" placeholder="标题" onChange={inputBlur} value={iptValue} />
             </div>
             <div style={{ width: '100%', height: 300, padding: ' 0px 10px', margin: '10px 0px' }}>
-                <div ref={quillRef} />
+                <div id={'quill-editors'}></div>
             </div>
         </div>
     )

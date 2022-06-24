@@ -14,10 +14,9 @@ const BaseRouter = () => (
         <Routes>
             <Route path="/" element={<App />}>
                 <Route path="/list" element={<List />}></Route>
-                <Route path="/article-management" element={<ArticleManagement />}>
-                    <Route path="/article-management/add" element={<Edit />}></Route>
-                    <Route path="/article-management/management" element={<Management />}></Route>
-                </Route>
+                <Route path="/article-management" element={<ArticleManagement />}></Route>
+                <Route path="/article-management/add" element={<Edit />}></Route>
+                <Route path="/article-management/management" element={<Management />}></Route>
                 <Route path="/user-list" element={<UserList />}></Route>
                 <Route path="/user-center" element={<UserCenter />}></Route>
             </Route>
