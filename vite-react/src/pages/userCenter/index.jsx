@@ -1,5 +1,5 @@
 import React, { useEffect, useState, useRef } from "react";
-import { Layout, Image, Button, List, Upload, message, Modal, Input } from 'antd';
+import { Layout, Image, Button, List, Upload, message, Modal, Input, Avatar } from 'antd';
 
 const { Sider, Content } = Layout;
 
@@ -24,6 +24,7 @@ function UserCenter(props) {
     const [data, setData] = useState([])
     const [content, setContent] = useState(null)
     const [propsData, setPropsData] = useState(true)
+    const [showAvatar, setShowAvatar] = useState(true)
 
     const handleOk = () => {
         if (olPassword != '' && nvPassword != '') {
@@ -124,6 +125,11 @@ function UserCenter(props) {
         if (!props?.userData) {
             setUpdataAvatar(`http://182.61.138.230:3002/uploads?img=${localStorage.getItem('icon')}`)
         }
+        if (localStorage.getItem('icon') != 'null') {
+            setShowAvatar(true)
+        } else {
+            setShowAvatar(false)
+        }
     }, [localStorage.getItem('icon')])
 
     useEffect(() => {
@@ -136,6 +142,11 @@ function UserCenter(props) {
             setPropsData(false)
             queryTextAwait(props?.userData?.id)
             setUpdataAvatar(`http://182.61.138.230:3002/uploads?img=${userData.icon}`)
+            if (userData?.icon) {
+                setShowAvatar(true)
+            } else {
+                setShowAvatar(false)
+            }
         }
     }, [props?.userData])
 
@@ -155,6 +166,7 @@ function UserCenter(props) {
                         width={200}
                         src={updataAvatar}
                         onClick={() => setVisible(true)}
+                        style={{ display: showAvatar ? 'block' : 'none' }}
                     />
                     <div
                         style={{
@@ -170,6 +182,7 @@ function UserCenter(props) {
                             <Image src={updataAvatar} />
                         </Image.PreviewGroup>
                     </div>
+                    <Avatar style={{ color: '#fff', backgroundColor: '#7265e6', margin: '10px auto', display: showAvatar ? 'none' : 'block' }} size={100}>{props?.userData?.username ? props?.userData?.username : localStorage.username}</Avatar>
                     <div className="usercenter_sider_action" style={{ display: propsData ? 'block' : 'none' }}>
                         <Upload {...upProps} showUploadList={false} onChange={uploadAvatar}>
                             <Button>修改头像</Button>
