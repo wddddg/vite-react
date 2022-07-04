@@ -13,11 +13,11 @@ const routes = [
         breadcrumbName: '文章管理',
         children: [
             {
-                path: '/add',
+                path: '/article-management/add',
                 breadcrumbName: '新建文章',
             },
             {
-                path: '/management',
+                path: '/article-management/management',
                 breadcrumbName: '用户文章列表管理',
             }
         ]
